@@ -17,6 +17,7 @@ contract PatentToken is IERC20, Ownable, Lockable
     uint public constant decimals = 18;
 
     uint256 private m_TotalSupply;
+    uint256 private m_CirculatingSupply;
     mapping(address => uint256) private m_Balances;
     mapping(address => mapping(address => uint256)) private m_Allowed;
 
@@ -26,11 +27,23 @@ contract PatentToken is IERC20, Ownable, Lockable
     function PatentToken(uint uTotalSupply)
     {
         m_TotalSupply = uTotalSupply;
+        m_CirculatingSupply = 0;
         m_Balances[msg.sender] = uTotalSupply;
     }
 
     function performTransfer(address aFrom, address aTo, uint256 uValue) private returns (bool bOutSuccess)
     {
+        if(aFrom == m_Owner)
+        {
+            m_TotalSupply.sub(uValue);
+            m_CirculatingSupply.add(uValue);
+        }
+        else if(aTo == m_Owner)
+        {
+            m_TotalSupply.add(uValue);
+            m_CirculatingSupply.sub(uValue);
+        }
+
         m_Balances[aFrom] = m_Balances[aFrom].sub(uValue);
         m_Balances[aTo] = m_Balances[aTo].add(uValue);
         Transfer(aFrom, aTo, uValue);
@@ -40,6 +53,11 @@ contract PatentToken is IERC20, Ownable, Lockable
     function totalSupply() constant external returns (uint256 uOutTotalSupply)
     {
         uOutTotalSupply = m_TotalSupply;
+    }
+
+    function circulatingSupply() constant external returns (uint256 uOutCirculatingSupply)
+    {
+        uOutCirculatingSupply = m_CirculatingSupply;
     }
 
     function balanceOf(address aOwner) constant external returns (uint256 uOutBalance)
