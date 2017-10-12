@@ -10,11 +10,10 @@ angular.module('PatentApp.views.wallet',['ngRoute', 'PatentApp.factories.WalletF
             $scope.walletAddress = "";
 
             $scope.getWallet = function(){
-                console.log("HI");
                 WalletFactory.getWalletInfo($scope.walletAddress).then(function(walletInfo){
-                    console.log(walletInfo)
+
                 },function(){
-                    console.log("ERR");
+
                 });
             };
     }]);
